@@ -10,10 +10,11 @@ module.exports = function handler() {
 
   _self.queryByArgs = function (req, res, db, args) {
     var
-    CX = process.env.CX || '009125351227783802211:ozmijg1hxnw',
-    key = process.env.API_KEY || 'AIzaSyBlve5Cy2Y7oy8AteMmSui2MrsDUkdQ7iA',
+    CX = process.env.CX || '***********',
+    key = process.env.API_KEY || '***********',
     newdoc = {
-      args : args
+      term : args,
+      when : new Date(),
     },
     offset,
     queryURL;
@@ -51,25 +52,28 @@ module.exports = function handler() {
             });
           });
           res.json(resultsToReturn);
-          
+
         } else {
           res.send("No data found");
         }
 
       } else
-          res.send(response.statusCode);
+        res.send(response.statusCode);
     });
   };
 
   _self.latest = function (req, res, db) {
-    db.collection('images').find().sort({
+    db.collection('images').find({}, {
+      term : 1,
+      when : 1,
+      _id : 0
+    }).sort({
       _id : -1
-    }).limit(1).toArray(function (err, doc) {
-      console.log("found? " + doc[0].args);
+    }).limit(10).toArray(function (err, doc) {
       if (err) {
         res.send(err);
       } else {
-        _self.queryByArgs(req, res, null, doc[0].args);
+        res.send(doc)
       }
     });
   };
